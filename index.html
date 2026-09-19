@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Anomaly Report - Cybersecurity Intelligence & Analysis</title>
+<meta name="description" content="Curated cybersecurity intelligence feed providing timely analysis of emerging threats, vulnerabilities, and industry developments.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect x='2' y='2' width='60' height='60' rx='8' stroke='%234db87a' stroke-width='3' fill='%230b0f0e'/><path d='M22 46 L32 18 L42 46' stroke='%234db87a' stroke-width='3' fill='none'/><path d='M27 34 L20 46' stroke='%234db87a' stroke-width='3' fill='none'/></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0b0f0e;--bgCard:#101816;--bgCardHover:#151f1b;--bgInput:#0d1311;
+--border:#1c2e26;--borderLight:#243830;
+--green:#4db87a;--greenBright:#5fcc8c;--greenMid:#3a9d6b;
+--greenDim:#2d7a54;--greenDark:#132e20;--greenDarkest:#0e1f16;
+--text:#b8cac2;--textBright:#d6e5de;--textDim:#5e776b;--textMuted:#3d5449;
+--mono:'Consolas','Menlo','Monaco','Liberation Mono','Courier New',monospace;
+--sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+--critical:#d94444;--high:#cf6a3a;--medium:#b8943a;--low:#5b99a8;--info:#7a8a9e;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+a{color:var(--greenMid);text-decoration:none;transition:color .15s}
+a:hover{color:var(--greenBright)}
+.scanline{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(30,80,55,.01) 3px,rgba(30,80,55,.01) 6px);pointer-events:none;z-index:9999}
+nav{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid var(--border);background:rgba(11,15,14,.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-title{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--green);letter-spacing:1.5px;text-transform:uppercase}
+.nav-links{display:flex;gap:3px}
+.nav-link{padding:8px 14px;font-size:12px;font-family:var(--mono);color:var(--textDim);background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;letter-spacing:.6px;text-transform:uppercase;transition:all .15s}
+.nav-link:hover{color:var(--greenMid)}
+.nav-link.active{color:var(--green);background:var(--greenDarkest);border-color:var(--greenDark)}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.card{background:var(--bgCard);border:1px solid var(--border);border-radius:6px;padding:20px;transition:border-color .15s,background .15s}
+.card:hover{border-color:var(--borderLight)}
+.h1{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--textBright);letter-spacing:.3px;margin-bottom:20px}
+.h2{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--greenMid);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+.badge{display:inline-block;padding:3px 10px;font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;border-radius:3px}
+.badge-Critical{color:var(--critical);border:1px solid rgba(217,68,68,.33);background:rgba(217,68,68,.06)}
+.badge-High{color:var(--high);border:1px solid rgba(207,106,58,.33);background:rgba(207,106,58,.06)}
+.badge-Medium{color:var(--medium);border:1px solid rgba(184,148,58,.33);background:rgba(184,148,58,.06)}
+.badge-Low{color:var(--low);border:1px solid rgba(91,153,168,.33);background:rgba(91,153,168,.06)}
+.badge-Informational{color:var(--info);border:1px solid rgba(122,138,158,.33);background:rgba(122,138,158,.06)}
+.tag{display:inline-block;padding:3px 9px;font-size:11px;font-family:var(--mono);letter-spacing:.3px;color:var(--greenDim);border:1px solid var(--greenDark);border-radius:3px;background:rgba(19,46,32,.4)}
+.src-tag{display:inline-block;padding:3px 9px;font-size:11px;font-family:var(--mono);letter-spacing:.3px;color:var(--textDim);border:1px solid var(--border);border-radius:3px}
+.bar-track{height:5px;border-radius:3px;background:var(--greenDarkest);overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s ease-out;background:var(--green)}
+.stat-num{font-family:var(--mono);font-weight:700;line-height:1;color:var(--green)}
+.stat-label{font-family:var(--mono);font-size:11px;color:var(--textDim);letter-spacing:1px;text-transform:uppercase;margin-top:8px}
+.meta{font-family:var(--mono);font-size:10px;color:var(--textMuted);letter-spacing:1.8px;text-transform:uppercase}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.feed-item{cursor:pointer;border-left:3px solid var(--border);transition:all .15s}
+.feed-item:hover{background:var(--bgCardHover)!important;border-color:var(--borderLight)!important}
+.feed-title{font-size:15px;font-weight:600;color:var(--textBright);margin-bottom:8px;line-height:1.4}
+.feed-summary{font-size:13px;color:var(--textDim);line-height:1.55;margin-bottom:12px}
+input[type=text],select{background:var(--bgInput);border:1px solid var(--border);border-radius:4px;padding:9px 12px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
+select{font-size:12px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%235e776b' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px}
+.btn-outline{padding:9px 16px;font-size:12px;font-family:var(--mono);font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--greenMid);background:transparent;border:1px solid var(--borderLight);border-radius:4px;cursor:pointer;transition:border-color .15s}
+.btn-outline:hover{border-color:var(--greenMid)}
+.article-content h2{font-family:var(--mono);font-size:16px;color:var(--greenBright);margin:28px 0 12px}
+.article-content h3{font-family:var(--mono);font-size:14px;color:var(--textBright);margin:20px 0 8px}
+.article-content p{font-size:14px;line-height:1.75;color:var(--text);margin:0 0 8px}
+.article-content ul,.article-content ol{padding-left:20px;margin:0 0 8px}
+.article-content li{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:4px}
+.article-content strong{color:var(--textBright)}
+footer{border-top:1px solid var(--border);padding:14px 24px;margin-top:48px;display:flex;justify-content:space-between}
+footer span{font-family:var(--mono);font-size:11px;color:var(--textMuted)}
+.source-card{padding:12px 14px;background:var(--bgInput);border-radius:4px;border:1px solid var(--border);display:block;transition:border-color .15s}
+.source-card:hover{border-color:var(--greenDim)}
+.loading{text-align:center;padding:60px 20px;font-family:var(--mono);color:var(--textDim);font-size:14px}
+@media(max-width:768px){
+.grid-2{grid-template-columns:1fr}
+nav{flex-wrap:wrap;gap:8px}
+.nav-links{flex-wrap:wrap}
+.wrap{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div id="root"></div>
+<script>
+const e=React.createElement;
+const DOMAINS_MAP={"Security & Risk Management":"Risk & Governance","Asset Security":"Data Protection","Security Architecture & Engineering":"Architecture & Engineering","Communication & Network Security":"Network Security","Identity & Access Management":"Identity & Access","Security Assessment & Testing":"Assessment & Testing","Security Operations":"Security Operations","Software Development Security":"AppSec & DevSecOps"};
+const SOURCES_META=[
+{id:"CISA",name:"CISA",desc:"Advisories, KEV Catalog, Alerts",url:"https://www.cisa.gov/news-events/cybersecurity-advisories"},
+{id:"NVD",name:"NVD / CVE",desc:"National Vulnerability Database",url:"https://nvd.nist.gov/"},
+{id:"MITRE ATT&CK",name:"MITRE ATT&CK",desc:"Threat framework updates",url:"https://attack.mitre.org/"},
+{id:"Mandiant",name:"Mandiant",desc:"Threat research & incident reports",url:"https://www.mandiant.com/resources/blog"},
+{id:"CrowdStrike",name:"CrowdStrike",desc:"Threat intelligence briefs",url:"https://www.crowdstrike.com/en-us/blog/"},
+{id:"Microsoft MSRC",name:"Microsoft MSRC",desc:"Security response center",url:"https://msrc.microsoft.com/update-guide/"},
+{id:"Cisco Talos",name:"Cisco Talos",desc:"Threat intelligence & research",url:"https://blog.talosintelligence.com/"},
+{id:"ZDI Blog",name:"ZDI Blog",desc:"Zero-day vulnerability research",url:"https://www.zerodayinitiative.com/blog"},
+{id:"SANS ISC",name:"SANS ISC",desc:"Internet Storm Center diaries",url:"https://isc.sans.edu/"},
+{id:"Unit 42",name:"Palo Alto Unit 42",desc:"Threat research & analysis",url:"https://unit42.paloaltonetworks.com/"},
+{id:"URLhaus",name:"URLhaus",desc:"Malware URL tracking & IOCs",url:"https://urlhaus.abuse.ch/"},
+{id:"NIST",name:"NIST",desc:"Standards & framework updates",url:"https://csrc.nist.gov/publications"},
+];
+const ALL_DOMAINS=Object.keys(DOMAINS_MAP);
+const CATEGORIES=["All","Vulnerability","Threat Actor","Active Campaign","Framework Update","Regulatory","Malware"];
+
+function Logo({size=26}){
+return e("svg",{width:size,height:size,viewBox:"0 0 64 64",fill:"none"},
+e("rect",{x:2,y:2,width:60,height:60,rx:8,stroke:"#3a9d6b",strokeWidth:2,fill:"none",opacity:.35}),
+e("rect",{x:8,y:8,width:48,height:48,rx:4,stroke:"#3a9d6b",strokeWidth:1.5,fill:"none",opacity:.5}),
+e("path",{d:"M22 46 L32 18 L42 46",stroke:"#4db87a",strokeWidth:3,strokeLinecap:"round",strokeLinejoin:"round",fill:"none"}),
+e("path",{d:"M27 34 L20 46",stroke:"#4db87a",strokeWidth:3,strokeLinecap:"round",strokeLinejoin:"round",fill:"none"}),
+e("path",{d:"M16 12 Q20 8, 24 12 Q28 16, 32 12 Q36 8, 40 12 Q44 16, 48 12",stroke:"#4db87a",strokeWidth:1.5,strokeLinecap:"round",fill:"none",opacity:.45}),
+);
+}
+function Badge({severity}){return e("span",{className:`badge badge-${severity}`},severity)}
+function Tag({children}){return e("span",{className:"tag"},children)}
+function SrcTag({children}){return e("span",{className:"src-tag"},children)}
+function Bar({pct,color}){return e("div",{className:"bar-track"},e("div",{className:"bar-fill",style:{width:`${Math.min(pct,100)}%`,background:color||null}}))}
+
+function renderMarkdown(content){
+if(!content)return null;
+const lines=content.split("\n");
+const elements=[];
+let i=0;
+for(const line of lines){
+const key=i++;
+if(line.startsWith("## "))elements.push(e("h2",{key},line.slice(3)));
+else if(line.startsWith("### "))elements.push(e("h3",{key},line.slice(4)));
+else if(line.startsWith("- **")){
+const clean=line.slice(2);
+const m=clean.match(/\*\*(.+?)\*\*(.*)/);
+if(m)elements.push(e("div",{key,style:{paddingLeft:16,marginBottom:6,fontSize:14,lineHeight:1.65}},e("strong",null,m[1]),m[2]));
+else elements.push(e("p",{key},clean.replace(/\*\*/g,"")));
+}
+else if(line.startsWith("- "))elements.push(e("div",{key,style:{paddingLeft:16,marginBottom:4,fontSize:14,lineHeight:1.65,color:"var(--text)"}},"\u2022 ",line.slice(2)));
+else if(/^\d+\.\s/.test(line))elements.push(e("div",{key,style:{paddingLeft:16,marginBottom:6,fontSize:14,lineHeight:1.65,color:"var(--text)"}},line));
+else if(line.startsWith("**")&&line.endsWith("**"))elements.push(e("div",{key,style:{fontSize:14,fontWeight:700,color:"var(--textBright)",margin:"12px 0 6px"}},line.replace(/\*\*/g,"")));
+else if(!line.trim())elements.push(e("div",{key,style:{height:8}}));
+else elements.push(e("p",{key},line.replace(/\*\*/g,"")));
+}
+return elements;
+}
+
+function App(){
+const[page,setPage]=React.useState("dashboard");
+const[article,setArticle]=React.useState(null);
+const[articles,setArticles]=React.useState([]);
+const[loading,setLoading]=React.useState(true);
+const[filter,setFilter]=React.useState({category:"All",severity:"All",domain:"All",search:""});
+
+React.useEffect(()=>{
+fetch("articles.json").then(r=>r.json()).then(data=>{setArticles(data);setLoading(false)}).catch(()=>setLoading(false));
+},[]);
+
+const nav=(p,a=null)=>{setPage(p);setArticle(a);window.scrollTo(0,0)};
+const filtered=React.useMemo(()=>articles.filter(a=>{
+if(filter.category!=="All"&&a.category!==filter.category)return false;
+if(filter.severity!=="All"&&a.severity!==filter.severity)return false;
+if(filter.domain!=="All"&&!a.domains.includes(filter.domain))return false;
+if(filter.search&&!a.title.toLowerCase().includes(filter.search.toLowerCase())&&!a.summary.toLowerCase().includes(filter.search.toLowerCase()))return false;
+return true;
+}),[articles,filter]);
+
+const uniqueDomains=new Set(articles.flatMap(a=>a.domains)).size;
+const latestDate=articles.length>0?articles[0].date:"\u2014";
+const sevCounts={};articles.forEach(a=>{sevCounts[a.severity]=(sevCounts[a.severity]||0)+1});
+const sevDist=["Critical","High","Medium","Low","Informational"].filter(s=>sevCounts[s]).map(s=>({name:s,count:sevCounts[s],color:`var(--${s==="Informational"?"info":s.toLowerCase()})`}));
+const maxSev=Math.max(...sevDist.map(s=>s.count),1);
+const domCov=ALL_DOMAINS.map(d=>({name:DOMAINS_MAP[d],count:articles.filter(a=>a.domains.includes(d)).length}));
+const maxDom=Math.max(...domCov.map(d=>d.count),1);
+
+// DASHBOARD
+function Dashboard(){
+if(loading)return e("div",{className:"wrap"},e("div",{className:"loading"},"Loading intelligence data..."));
+if(articles.length===0)return e("div",{className:"wrap"},e("div",{className:"loading"},"No published reports yet. Check back soon."));
+return e("div",{className:"wrap"},
+e("div",{style:{marginBottom:28}},
+e("div",{className:"meta",style:{marginBottom:10}},"System Online \u00B7 ",new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})),
+e("h1",{className:"h1",style:{fontSize:26,marginBottom:6}},"Mission Control"),
+e("p",{style:{color:"var(--textDim)",fontSize:14}},"Cybersecurity intelligence overview and threat landscape monitoring"),
+),
+e("div",{className:"grid-4",style:{marginBottom:24}},
+...[{v:articles.length,l:"Reports Published"},{v:SOURCES_META.length,l:"Sources Monitored"},{v:uniqueDomains,l:"Focus Areas Covered"},{v:latestDate,l:"Last Updated",sm:true}].map((s,i)=>
+e("div",{key:i,className:"card",style:{textAlign:"center",padding:"20px 18px"}},
+e("div",{className:"stat-num",style:{fontSize:s.sm?17:34}},s.v),
+e("div",{className:"stat-label"},s.l),
+))),
+sevDist.length>0&&e("div",{className:"card",style:{marginBottom:24}},
+e("div",{className:"h2"},"Threat Severity Distribution"),
+e("div",{style:{display:"flex",gap:12,alignItems:"flex-end",height:100,padding:"0 8px"}},
+...sevDist.map((s,i)=>e("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:6}},
+e("span",{style:{fontFamily:"var(--mono)",fontSize:17,fontWeight:700,color:s.color}},s.count),
+e("div",{style:{width:"100%",maxWidth:80,borderRadius:"3px 3px 0 0",background:s.color+"30",border:`1px solid ${s.color}40`,borderBottom:`3px solid ${s.color}`,height:`${Math.max(s.count/maxSev*100,15)}%`}}),
+e("span",{style:{fontFamily:"var(--mono)",fontSize:10,color:"var(--textDim)",letterSpacing:".8px",textTransform:"uppercase"}},s.name),
+)))),
+e("div",{className:"grid-2"},
+e("div",{className:"card"},
+e("div",{className:"h2"},"Latest Reports"),
+...articles.slice(0,4).map(a=>e("div",{key:a.id,onClick:()=>nav("article",a),style:{padding:"12px 0",borderBottom:"1px solid rgba(28,46,38,.2)",cursor:"pointer"}},
+e("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},e(Badge,{severity:a.severity}),e("span",{style:{fontFamily:"var(--mono)",fontSize:10,color:"var(--textMuted)"}},a.id)),
+e("div",{style:{fontSize:14,color:"var(--textBright)",lineHeight:1.4}},a.title),
+e("div",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textMuted)",marginTop:4}},a.date),
+)),
+e("div",{onClick:()=>nav("feed"),style:{fontFamily:"var(--mono)",fontSize:12,color:"var(--greenDim)",cursor:"pointer",marginTop:14}},"View all reports \u2192"),
+),
+e("div",{className:"card"},
+e("div",{className:"h2"},"Coverage by Focus Area"),
+...domCov.map((d,i)=>e("div",{key:i,style:{marginBottom:11}},
+e("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:4}},
+e("span",{style:{fontSize:13,color:"var(--text)"}},d.name),
+e("span",{style:{fontFamily:"var(--mono)",fontSize:12,color:"var(--greenDim)"}},d.count)),
+e(Bar,{pct:d.count/maxDom*100}),
+))),
+),
+e("div",{className:"card",style:{marginTop:20}},
+e("div",{className:"h2"},"Intelligence Sources"),
+e("div",{style:{display:"flex",flexWrap:"wrap",gap:8}},
+...SOURCES_META.map(src=>{const c=articles.filter(a=>a.sources&&a.sources.includes(src.id)).length;return e("a",{key:src.id,href:src.url,target:"_blank",rel:"noopener noreferrer",style:{padding:"8px 14px",background:c>0?"var(--greenDarkest)":"transparent",border:`1px solid ${c>0?"var(--greenDark)":"var(--border)"}`,borderRadius:4,fontFamily:"var(--mono)",fontSize:11,color:c>0?"var(--greenMid)":"var(--textMuted)",letterSpacing:".3px"}},src.id," ",e("span",{style:{opacity:.5}},"(",c,")"))}))),
+);
+}
+
+// FEED
+function Feed(){
+return e("div",{className:"wrap"},
+e("h1",{className:"h1"},"Intelligence Feed"),
+e("div",{className:"card",style:{marginBottom:20,display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}},
+e("input",{type:"text",placeholder:"Search reports...",value:filter.search,onChange:ev=>setFilter(f=>({...f,search:ev.target.value})),style:{maxWidth:260,width:"100%"}}),
+e("select",{value:filter.category,onChange:ev=>setFilter(f=>({...f,category:ev.target.value}))},CATEGORIES.map(c=>e("option",{key:c,value:c},c))),
+e("select",{value:filter.severity,onChange:ev=>setFilter(f=>({...f,severity:ev.target.value}))},e("option",{value:"All"},"All Severities"),["Critical","High","Medium","Low","Informational"].map(s=>e("option",{key:s,value:s},s))),
+e("select",{value:filter.domain,onChange:ev=>setFilter(f=>({...f,domain:ev.target.value}))},e("option",{value:"All"},"All Focus Areas"),ALL_DOMAINS.map(d=>e("option",{key:d,value:d},DOMAINS_MAP[d]))),
+e("span",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textMuted)",marginLeft:"auto"}},filtered.length," report",filtered.length!==1?"s":""),
+),
+e("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+...filtered.map(a=>e("div",{key:a.id,className:"card feed-item",onClick:()=>nav("article",a),style:{borderLeftColor:`var(--${a.severity==="Informational"?"info":a.severity.toLowerCase()})`}},
+e("div",{style:{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:16}},
+e("div",{style:{flex:1}},
+e("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:8,flexWrap:"wrap"}},e(Badge,{severity:a.severity}),e("span",{style:{fontFamily:"var(--mono)",fontSize:10,color:"var(--textMuted)"}},a.id),e("span",{style:{fontFamily:"var(--mono)",fontSize:10,color:"var(--textMuted)",padding:"2px 7px",border:"1px solid var(--border)",borderRadius:2}},a.category)),
+e("div",{className:"feed-title"},a.title),
+e("div",{className:"feed-summary"},a.summary),
+e("div",{style:{display:"flex",gap:5,flexWrap:"wrap",alignItems:"center"}},...(a.domains||[]).map(d=>e(Tag,{key:d},DOMAINS_MAP[d]||d)),e("span",{style:{margin:"0 3px",color:"var(--border)"}},"|"),...(a.sources||[]).map(s=>e(SrcTag,{key:s},s))),
+),
+e("div",{style:{textAlign:"right",minWidth:90,flexShrink:0}},
+e("div",{style:{fontFamily:"var(--mono)",fontSize:12,color:"var(--textMuted)"}},a.date),
+e("div",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textDim)",marginTop:4}},a.readTimeMin," min read"),
+),
+),
+)),
+filtered.length===0&&e("div",{className:"card",style:{textAlign:"center",padding:"48px 20px"}},e("div",{style:{fontFamily:"var(--mono)",fontSize:14,color:"var(--textDim)"}},"No reports match current filters")),
+),
+);
+}
+
+// ARTICLE
+function ArticlePage(){
+if(!article)return null;
+const a=article;
+return e("div",{className:"wrap"},
+e("div",{onClick:()=>nav("feed"),style:{fontFamily:"var(--mono)",fontSize:12,color:"var(--greenDim)",cursor:"pointer",marginBottom:20}},"\u2190 Back to Feed"),
+e("div",{className:"card"},
+e("div",{style:{marginBottom:24,paddingBottom:20,borderBottom:"1px solid var(--border)"}},
+e("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12,flexWrap:"wrap"}},e(Badge,{severity:a.severity}),e("span",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textMuted)"}},a.id),e("span",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textMuted)"}},a.category),e("span",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textMuted)"}},a.date)),
+e("h1",{style:{fontSize:21,fontWeight:700,color:"var(--textBright)",lineHeight:1.35,marginBottom:14}},a.title),
+e("div",{style:{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}},...(a.domains||[]).map(d=>e(Tag,{key:d},DOMAINS_MAP[d]||d))),
+e("div",{style:{fontFamily:"var(--mono)",fontSize:11,color:"var(--textMuted)"}},a.readTimeMin," min read"),
+),
+e("div",{className:"article-content",style:{maxWidth:780}},renderMarkdown(a.content)),
+e("div",{style:{marginTop:32,paddingTop:20,borderTop:"1px solid var(--border)"}},
+e("div",{className:"h2",style:{marginBottom:12}},"Sources & References"),
+e("div",{style:{display:"flex",flexDirection:"column",gap:8}},...(a.sourceLinks||[]).map((sl,i)=>e("div",{key:i,style:{display:"flex",alignItems:"center",gap:8}},
+e("span",{style:{color:"var(--greenDim)",fontSize:12}},"\u25B8"),
+e("a",{href:sl.url,target:"_blank",rel:"noopener noreferrer",style:{fontFamily:"var(--mono)",fontSize:13}},sl.name," \u2197"),
+))),
+),
+),
+);
+}
+
+// ABOUT
+function AboutPage(){
+return e("div",{className:"wrap"},
+e("div",{style:{maxWidth:780,margin:"0 auto"}},
+e("div",{style:{textAlign:"center",marginBottom:40,paddingTop:16}},
+e(Logo,{size:72}),
+e("h1",{className:"h1",style:{fontSize:30,marginTop:18,marginBottom:6}},"The Anomaly Report"),
+e("p",{style:{fontFamily:"var(--mono)",fontSize:12,color:"var(--greenDim)",letterSpacing:"1.5px"}},"CYBERSECURITY INTELLIGENCE & ANALYSIS"),
+),
+e("div",{className:"card",style:{marginBottom:20}},
+e("div",{className:"h2"},"About This Platform"),
+e("p",{style:{fontSize:14,lineHeight:1.75,color:"var(--text)",marginBottom:10}},"The Anomaly Report is a curated cybersecurity intelligence feed providing timely analysis of emerging threats, vulnerabilities, and industry developments. Each report synthesizes information from authoritative sources to deliver actionable security intelligence for practitioners and decision-makers."),
+e("p",{style:{fontSize:14,lineHeight:1.75,color:"var(--text)"}},"Coverage spans the full spectrum of cybersecurity - from critical vulnerability disclosures and active threat campaigns to regulatory changes and framework updates - drawing from leading research teams, government advisories, and operational threat feeds."),
+),
+e("div",{className:"card",style:{marginBottom:20}},
+e("div",{className:"h2"},"About the Author"),
+e("p",{style:{fontSize:14,lineHeight:1.75,color:"var(--text)",marginBottom:10}},"Security professional with hands-on experience in security engineering leadership and a commitment to continuous learning in the evolving cybersecurity landscape. Focused on translating complex threat intelligence into actionable analysis for security teams and organizational stakeholders."),
+e("div",{style:{display:"flex",gap:10,marginTop:16}},
+e("a",{href:"https://github.com/cybermesa",target:"_blank",rel:"noopener noreferrer",className:"btn-outline"},"GitHub"),
+),
+),
+e("div",{className:"card"},
+e("div",{className:"h2"},"Intelligence Sources"),
+e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},...SOURCES_META.map(src=>
+e("a",{key:src.id,href:src.url,target:"_blank",rel:"noopener noreferrer",className:"source-card"},
+e("div",{style:{fontFamily:"var(--mono)",fontSize:12,color:"var(--greenMid)",marginBottom:3,display:"flex",justifyContent:"space-between"}},src.name,e("span",{style:{fontSize:11,color:"var(--textMuted)",opacity:.6}},"\u2197")),
+e("div",{style:{fontSize:11,color:"var(--textDim)"}},src.desc),
+))),
+),
+));
+}
+
+const pages={dashboard:Dashboard,feed:Feed,article:ArticlePage,about:AboutPage};
+const PageComp=pages[page]||Dashboard;
+
+return e(React.Fragment,null,
+e("nav",null,
+e("div",{className:"nav-brand",onClick:()=>nav("dashboard")},e(Logo,null),e("span",{className:"nav-title"},"The Anomaly Report")),
+e("div",{className:"nav-links"},
+...[{id:"dashboard",l:"Dashboard"},{id:"feed",l:"Intel Feed"},{id:"about",l:"About"}].map(lk=>
+e("div",{key:lk.id,className:`nav-link${page===lk.id||(page==="article"&&lk.id==="feed")?" active":""}`,onClick:()=>nav(lk.id)},lk.l))),
+),
+e(PageComp),
+e("footer",null,
+e("span",null,"The Anomaly Report \u00A9 ",new Date().getFullYear()," \u2014 Cybersecurity Intelligence & Analysis"),
+e("span",null,"cybermesa"),
+),
+);
+}
+
+ReactDOM.render(e(App),document.getElementById("root"));
+</script>
+</body>
+</html>
